@@ -6,7 +6,11 @@ from datetime import datetime, timezone, time
 import os
 import textwrap
 from zoneinfo import ZoneInfo
-from tzlocal import get_localzone, get_localzone_name
+from tzlocal import get_localzone
+try:
+    from tzlocal import get_localzone_name
+except ImportError:
+    get_localzone_name = lambda: str(get_localzone())
 
 
 def get_meal_times(meal_name):
