@@ -6,7 +6,7 @@ from datetime import datetime, timezone, time
 import os
 import textwrap
 from zoneinfo import ZoneInfo
-from tzlocal import get_localzone
+from tzlocal import get_localzone, get_localzone_name
 
 
 def get_meal_times(meal_name):
@@ -70,7 +70,7 @@ def format_description(menu_meals):
 def create_ics_event(uid, dtstamp, start_time, end_time, summary, description):
     """Creates a single VEVENT string."""
     # Get local timezone name for the TZID parameter
-    tz_name = get_localzone().key
+    tz_name = get_localzone_name()
     return (
         "BEGIN:VEVENT\n"
         f"UID:{uid}\n"
@@ -89,7 +89,7 @@ def get_vtimezone_component():
     but it's sufficient for current and future dates.
     """
     local_tz = get_localzone()
-    tz_name = local_tz.key
+    tz_name = get_localzone_name()
     now = datetime.now(local_tz)
 
     # Get current standard and daylight time transitions if they exist
