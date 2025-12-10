@@ -2,7 +2,7 @@
 
 import argparse
 import json
-from datetime import datetime, timedelta
+from datetime import datetime, timezone
 import os
 import textwrap
 
@@ -85,7 +85,7 @@ def process_json_file(filepath):
         return None
 
     ics_events = []
-    dtstamp = datetime.utcnow().strftime("%Y%m%dT%H%M%SZ")
+    dtstamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
 
     for session in data.get("FamilyMenuSessions", []):
         serving_session = session.get("ServingSession")
