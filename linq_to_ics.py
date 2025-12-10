@@ -29,8 +29,9 @@ def format_description(menu_meals):
 
     for meal in menu_meals:
         meal_name = meal.get("MenuMealName", "")
+        # Convert recipe names to title case for better readability.
         recipes = [
-            recipe["RecipeName"]
+            recipe["RecipeName"].title()
             for category in meal.get("RecipeCategories", [])
             for recipe in category.get("Recipes", [])
         ]
@@ -40,25 +41,16 @@ def format_description(menu_meals):
         elif "Milk" in meal_name:
             milk.extend(recipes)
         else:
-            # Group other items by their MenuMealName
-            if recipes:
-                other.append(f"== {meal_name} ==")
-                other.extend(f"- {r}" for r in recipes)
+            other.extend(recipes)
 
     description_parts = []
     if specials:
-        description_parts.append("== Daily Special ==")
         description_parts.extend(f"- {s}" for s in specials)
 
     if other:
-        if description_parts:
-            description_parts.append("\\n") # Add a newline for spacing
-        description_parts.extend(other)
+        description_parts.extend(f"- {o}" for o in other)
 
     if milk:
-        if description_parts:
-            description_parts.append("\\n") # Add a newline for spacing
-        description_parts.append("== Milk ==")
         description_parts.extend(f"- {m}" for m in milk)
 
     # textwrap.fill is used for proper folding in ICS
