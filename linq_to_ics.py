@@ -18,6 +18,19 @@ def get_meal_times(meal_name):
     }
     return times.get(meal_name, (None, None))
 
+def get_main_entrees(menu_meals):
+    """Extracts main entree items for the event summary."""
+    entrees = []
+    for meal in menu_meals:
+        # "Daily Special" is also treated as a main entree for summary purposes
+        if "Daily Special" in meal.get("MenuMealName", "") or "Entree" in meal.get("MenuMealName", ""):
+             for category in meal.get("RecipeCategories", []):
+                entrees.extend([
+                    recipe["RecipeName"].title()
+                    for recipe in category.get("Recipes", [])
+                ])
+    return entrees
+
 def format_description(menu_meals):
     """
     Formats the list of food items for the event description,
@@ -36,17 +49,15 @@ def format_description(menu_meals):
             for recipe in category.get("Recipes", [])
         ]
 
-        if "Daily Special" in meal_name:
-            specials.extend(recipes)
+        # Main entrees are now in the summary, so we exclude them from the description.
+        if "Daily Special" in meal_name or "Entree" in meal_name:
+            continue
         elif "Milk" in meal_name:
             milk.extend(recipes)
         else:
             other.extend(recipes)
 
     description_parts = []
-    if specials:
-        description_parts.extend(f"- {s}" for s in specials)
-
     if other:
         description_parts.extend(f"- {o}" for o in other)
 
@@ -155,10 +166,13 @@ def process_json_file(filepath):
                     print(f"Skipping invalid date: {date_str}")
                     continue
 
+                menu_meals = day.get("MenuMeals", [])
+                main_entrees = get_main_entrees(menu_meals)
+
                 start_time = f"{date_yyyymmdd}T{start_hhmmss}"
                 end_time = f"{date_yyyymmdd}T{end_hhmmss}"
-                summary = serving_session
-                description = format_description(day.get("MenuMeals", []))
+                summary = ", ".join(main_entrees) if main_entrees else serving_session
+                description = format_description(menu_meals)
                 
                 # Create a unique ID for the event
                 uid = f"{date_yyyymmdd}-{serving_session}-{plan.get('MenuPlanId', '')}@{os.path.basename(filepath)}"
