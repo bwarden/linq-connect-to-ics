@@ -183,11 +183,13 @@ def process_json_file(filepath):
         return None
 
     vtimezone_block = get_vtimezone_component()
+    calendar_name = os.path.splitext(os.path.basename(filepath))[0]
 
     return (
         "BEGIN:VCALENDAR\n"
         "VERSION:2.0\n"
         "PRODID:-//GeminiCodeAssist//LINQ to ICS//EN\n"
+        f"X-WR-CALNAME:{calendar_name}\n"
         + vtimezone_block + "".join(ics_events) +
         "END:VCALENDAR\n"
     )
