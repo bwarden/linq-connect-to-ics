@@ -206,11 +206,13 @@ def main():
     for json_file in args.json_files:
         ics_content = process_json_file(json_file)
         if ics_content:
+            input_dir = os.path.dirname(json_file)
             basename = os.path.splitext(os.path.basename(json_file))[0]
             ics_filename = f"{basename}.ics"
-            with open(ics_filename, 'w') as f:
+            ics_filepath = os.path.join(input_dir, ics_filename)
+            with open(ics_filepath, 'w') as f:
                 f.write(ics_content)
-            print(f"Successfully created {ics_filename}")
+            print(f"Successfully created {ics_filepath}")
 
 if __name__ == "__main__":
     main()
